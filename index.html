@@ -22,6 +22,11 @@
             --accent: #dca856; /* 芥末黃 */
             --text-main: #4a4a4a;
             --text-light: #7a7a7a;
+            /* 標籤顏色 */
+            --tag-eat: #e67e22;
+            --tag-buy: #e74c3c;
+            --tag-go: #27ae60;
+            --tag-code: #2980b9;
         }
 
         body {
@@ -35,7 +40,7 @@
             font-weight: 500;
         }
 
-        h1, h2, .handwriting {
+        h1, h2, h3, .handwriting {
             font-family: 'Yomogi', "Microsoft JhengHei", cursive;
         }
 
@@ -56,6 +61,7 @@
             box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(0,0,0,0.02);
             transition: transform 0.2s ease;
+            cursor: pointer; /* 讓使用者知道可以點擊 */
         }
         
         .watercolor-card:active {
@@ -102,6 +108,64 @@
         .tab-content.active {
             display: block;
         }
+        
+        /* 影音卡片特定樣式 */
+        .yt-icon { color: #FF0000; }
+        .ig-icon { 
+            background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Modal 彈窗樣式 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            backdrop-filter: blur(3px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            max-width: 400px;
+            max-height: 85vh;
+            overflow-y: auto;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* 導遊分析標籤樣式 */
+        .guide-tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 4px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 4px;
+        }
+        .tag-eat { background-color: var(--tag-eat); }
+        .tag-buy { background-color: var(--tag-buy); }
+        .tag-go { background-color: var(--tag-go); }
+        .tag-code { background-color: var(--tag-code); font-family: monospace; letter-spacing: 1px;}
     </style>
 </head>
 <body class="pb-24">
@@ -121,8 +185,10 @@
 
     <section id="plan" class="tab-content active px-4 pt-4">
         <div class="flex overflow-x-auto no-scrollbar gap-3 mb-4 pb-2" id="date-scroll"></div>
-        <div id="weather-card-container"></div>
+        <div id="weather-card-container">
+            </div>
         <div id="itinerary-container" class="space-y-6 relative timeline-line mt-4"></div>
+        <p class="text-center text-xs text-gray-400 mt-4">✨ 點擊行程卡片查看導遊攻略 ✨</p>
     </section>
 
     <section id="guide" class="tab-content px-4 pt-4 space-y-6">
@@ -131,6 +197,14 @@
             <p class="text-sm text-gray-500">城市的記憶與故事</p>
         </div>
         <div id="guide-container" class="space-y-8"></div>
+    </section>
+    
+    <section id="media" class="tab-content px-4 pt-4">
+        <div class="text-center mb-6">
+            <h2 class="text-2xl handwriting text-[#dca856]">Video Guide</h2>
+            <p class="text-sm text-gray-500">收藏的影片與Reels</p>
+        </div>
+        <div id="media-container" class="space-y-4"></div>
     </section>
 
     <section id="lists" class="tab-content px-4 pt-4">
@@ -143,8 +217,61 @@
         </div>
     </section>
 
-    <section id="info" class="tab-content px-4 pt-4">
-        <div class="grid grid-cols-2 gap-4 mb-6">
+    <section id="info" class="tab-content px-4 pt-4 space-y-6">
+        
+        <div>
+            <h3 class="text-lg font-bold text-[#769a9e] mb-2"><i class="fas fa-plane-departure mr-2"></i>航班資訊</h3>
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-3">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-700">TPE</div>
+                        <div class="text-xs text-gray-400">台北桃園 T2</div>
+                    </div>
+                    <div class="flex-1 px-4 text-center">
+                        <div class="text-[#dca856] text-sm"><i class="fas fa-plane"></i> CI154</div>
+                        <div class="h-[1px] bg-gray-300 w-full my-1"></div>
+                        <div class="text-xs text-gray-400">2h 30m</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-gray-700">NGO</div>
+                        <div class="text-xs text-gray-400">中部國際 T1</div>
+                    </div>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <div><span class="text-gray-400">去程：</span>02/09 07:35</div>
+                    <div><span class="text-gray-400">回程：</span>02/13 12:05 (CI155)</div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-lg font-bold text-[#e6a496] mb-2"><i class="fas fa-hotel mr-2"></i>住宿資訊</h3>
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 space-y-3">
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-full bg-[#f9f7f2] flex items-center justify-center text-[#e6a496] shrink-0">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-gray-700">牧野東公園旁住宿 (Airbnb)</div>
+                        <div class="text-xs text-gray-500 mb-1">02/09 - 02/12 (3晚)</div>
+                        <a href="https://maps.google.com/?q=牧野東公園" target="_blank" class="text-xs text-[#769a9e] underline">查看地圖</a>
+                    </div>
+                </div>
+                <hr class="border-gray-50">
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-full bg-[#f9f7f2] flex items-center justify-center text-[#e6a496] shrink-0">
+                        <i class="fas fa-hotel"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-gray-700">Nagoya JR Gate Tower Hotel</div>
+                        <div class="text-xs text-gray-500 mb-1">02/12 - 02/13 (1晚)</div>
+                        <a href="https://maps.google.com/?q=Nagoya+JR+Gate+Tower+Hotel" target="_blank" class="text-xs text-[#769a9e] underline">查看地圖</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
             <a href="https://www.jma.go.jp/bosai/forecast/" target="_blank" class="watercolor-card p-4 flex flex-col items-center justify-center gap-2 text-center text-[#5e8b7e]">
                 <i class="fas fa-cloud-sun text-3xl"></i>
                 <span class="font-bold">天氣預報</span>
@@ -152,51 +279,114 @@
             </a>
             <a href="https://vjw-lp.digital.go.jp/en/" target="_blank" class="watercolor-card p-4 flex flex-col items-center justify-center gap-2 text-center text-[#e6a496]">
                 <i class="fas fa-qrcode text-3xl"></i>
-                <span class="font-bold">Visit Japan Web</span>
-                <span class="text-xs text-gray-400">入境登錄</span>
+                <span class="font-bold">VJW 入境</span>
+                <span class="text-xs text-gray-400">通關必備</span>
             </a>
+        </div>
+
+        <div class="bg-red-50 rounded-xl p-4 border border-red-100 mb-20">
+            <h3 class="text-red-800 font-bold mb-2"><i class="fas fa-exclamation-circle mr-2"></i>緊急聯絡</h3>
+            <ul class="text-sm text-red-700 space-y-1">
+                <li class="flex justify-between"><span>報警 (警察局)</span><span class="font-mono font-bold">110</span></li>
+                <li class="flex justify-between"><span>火警 / 救護車</span><span class="font-mono font-bold">119</span></li>
+                <li class="mt-2 text-xs border-t border-red-200 pt-2">
+                    <div class="font-bold">台北駐大阪經濟文化辦事處</div>
+                    <div class="font-mono">06-6227-8623</div>
+                    <div class="text-[10px] opacity-75">緊急：090-8794-4568</div>
+                </li>
+            </ul>
         </div>
     </section>
 
-    <nav class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-filter backdrop-blur-lg border-t border-gray-200 pb-safe pt-2 px-6 flex justify-between items-center z-50 h-[80px] rounded-t-[20px] shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
-        <button onclick="switchTab('plan')" class="nav-item active flex flex-col items-center gap-1 text-gray-400 transition-colors w-16" id="nav-plan">
+    <nav class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-filter backdrop-blur-lg border-t border-gray-200 pb-safe pt-2 px-2 flex justify-between items-center z-50 h-[80px] rounded-t-[20px] shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
+        <button onclick="switchTab('plan')" class="nav-item active flex flex-col items-center gap-1 text-gray-400 transition-colors flex-1" id="nav-plan">
             <i class="fas fa-calendar-alt text-lg"></i>
             <span class="text-[10px]">行程</span>
         </button>
-        <button onclick="switchTab('guide')" class="nav-item flex flex-col items-center gap-1 text-gray-400 transition-colors w-16" id="nav-guide">
+        <button onclick="switchTab('guide')" class="nav-item flex flex-col items-center gap-1 text-gray-400 transition-colors flex-1" id="nav-guide">
             <i class="fas fa-book-open text-lg"></i>
             <span class="text-[10px]">導覽</span>
         </button>
-        <button onclick="switchTab('lists')" class="nav-item flex flex-col items-center gap-1 text-gray-400 transition-colors w-16" id="nav-lists">
+        <button onclick="switchTab('media')" class="nav-item flex flex-col items-center gap-1 text-gray-400 transition-colors flex-1" id="nav-media">
+            <i class="fas fa-play-circle text-lg"></i>
+            <span class="text-[10px]">影音</span>
+        </button>
+        <button onclick="switchTab('lists')" class="nav-item flex flex-col items-center gap-1 text-gray-400 transition-colors flex-1" id="nav-lists">
             <i class="fas fa-list-check text-lg"></i>
             <span class="text-[10px]">清單</span>
         </button>
-        <button onclick="switchTab('info')" class="nav-item flex flex-col items-center gap-1 text-gray-400 transition-colors w-16" id="nav-info">
+        <button onclick="switchTab('info')" class="nav-item flex flex-col items-center gap-1 text-gray-400 transition-colors flex-1" id="nav-info">
             <i class="fas fa-info-circle text-lg"></i>
             <span class="text-[10px]">資訊</span>
         </button>
     </nav>
 
+    <div id="event-modal" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="relative h-32 bg-[#769a9e] overflow-hidden rounded-t-[20px]">
+                <div class="absolute top-0 left-0 w-full h-full bg-black/20 z-10"></div>
+                <div class="absolute bottom-4 left-4 z-20 text-white">
+                    <div class="text-xs opacity-80 mb-1" id="modal-time">10:00 - 12:00</div>
+                    <h3 class="text-2xl font-bold" id="modal-title">景點標題</h3>
+                </div>
+                <button onclick="closeModal()" class="absolute top-3 right-3 z-30 w-8 h-8 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/50 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-5">
+                <div id="modal-analysis" class="mb-4">
+                    <div class="flex flex-wrap gap-2 mb-3" id="modal-tags"></div>
+                    <div class="bg-[#f9f7f2] p-3 rounded-lg text-sm text-gray-600 leading-relaxed border-l-4 border-[#dca856]">
+                        <span class="font-bold block text-[#dca856] mb-1"><i class="fas fa-lightbulb mr-1"></i>導遊筆記：</span>
+                        <span id="modal-desc"></span>
+                    </div>
+                </div>
+                
+                <a id="modal-map-btn" href="#" target="_blank" class="w-full bg-[#5e8b7e] text-white py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-[#4a7266] transition-colors shadow-md">
+                    <i class="fas fa-map-marked-alt"></i> 開啟 Google Maps 導航
+                </a>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // 資料區
+        // 資料區 - 擴充導遊分析資料
+        // locations: 用於氣象 API (lat, lon)
+        const locationCoords = {
+            "Nagoya": { lat: 35.1815, lon: 136.9066 },
+            "Tokoname": { lat: 34.8893, lon: 136.8346 },
+            "Inuyama": { lat: 35.3883, lon: 136.9396 },
+            "Shirakawa": { lat: 36.2566, lon: 136.9043 }, // 白川鄉
+            "Takayama": { lat: 36.1408, lon: 137.2523 }
+        };
+
         const itineraryData = [
             {
                 date: "2/9",
                 day: "週一",
                 hotel: "牧野東公園旁住宿",
-                // 新增天氣資訊
-                weather: { min: 3, max: 11, condition: "晴時多雲", icon: "fa-sun" },
-                outfit: "室內外溫差大。機場與電車暖氣強，建議「洋蔥式穿搭」，內層薄長袖，外搭保暖大衣方便穿脫。",
+                locationKey: "Tokoname", // 當日主要天氣參考點
+                outfit: "洋蔥式穿搭。機場與電車暖氣強，外搭保暖大衣方便穿脫。",
                 events: [
                     { time: "05:00", end: "05:30", title: "前往桃園機場", icon: "fa-car", important: true },
-                    { time: "07:35", end: "11:05", title: "TPE ✈️ NGO (CI154)", icon: "fa-plane", desc: "抵達中部國際機場 T1" },
-                    { time: "12:00", end: "12:20", title: "移動：機場 → 常滑", icon: "fa-train", important: true },
-                    { time: "12:20", end: "14:00", title: "常滑散策", icon: "fa-cat", desc: "常滑老街、招財貓道、吃地瓜", location: "常滑老街" },
+                    { time: "07:35", end: "11:05", title: "TPE ✈️ NGO (CI154)", icon: "fa-plane", desc: "入境後記得先開通 eSIM", guide: "機場出關預抓 40-60 分鐘。名鐵電車車票可於自動售票機購買。" },
+                    { time: "12:00", end: "12:20", title: "移動：機場 → 常滑", icon: "fa-train", important: true, guide: "搭乘名鐵常滑線，僅需2站。" },
+                    { 
+                        time: "12:20", end: "14:00", title: "常滑散策", icon: "fa-cat", location: "常滑老街",
+                        guide: "陶瓷之都。沿著「陶器散步道」走，必拍巨大招財貓 Tokonyan。",
+                        tags: [{text: "必吃：烤地瓜", type: "eat"}, {text: "必拍：招財貓", type: "go"}]
+                    },
                     { time: "14:00", end: "15:00", title: "移動：名古屋站 → 住宿", icon: "fa-suitcase", important: true },
-                    { time: "15:00", end: "15:40", title: "移動：住宿 → 熱田神宮", icon: "fa-train", important: true },
-                    { time: "15:40", end: "17:30", title: "熱田神宮", icon: "fa-torii-gate", desc: "參拜、散步、商店街小吃", location: "熱田神宮" },
-                    { time: "17:30", end: "18:00", title: "移動：熱田神宮 → 蓬萊軒 鰻魚飯", icon: "fa-train", important: true },
-                    { time: "18:00", end: "21:30", title: "蓬萊軒 鰻魚飯", icon: "fa-utensils", desc: "松阪屋店，排隊＋用餐，空檔逛 PARCO", location: "蓬萊軒 松坂屋店" },
+                    { 
+                        time: "15:40", end: "17:30", title: "熱田神宮", icon: "fa-torii-gate", location: "熱田神宮",
+                        guide: "日本三大神宮之一。建議在樹林中深呼吸感受芬多精。",
+                        tags: [{text: "必吃：宮きしめん(寬麵)", type: "eat"}, {text: "必看：信長牆", type: "go"}]
+                    },
+                    { 
+                        time: "18:00", end: "21:30", title: "蓬萊軒 鰻魚飯", icon: "fa-utensils", location: "蓬萊軒 松坂屋店",
+                        guide: "名古屋最知名的鰻魚飯三吃。通常需排隊，建議先去抽整理券再去逛街。",
+                        tags: [{text: "必吃：鰻魚飯三吃", type: "eat"}, {text: "預約：現場抽券", type: "code"}]
+                    },
                     { time: "21:30", end: "22:00", title: "返回住宿", icon: "fa-bed" }
                 ]
             },
@@ -204,75 +394,100 @@
                 date: "2/10",
                 day: "週二",
                 hotel: "牧野東公園旁住宿",
-                weather: { min: 2, max: 10, condition: "多雲", icon: "fa-cloud" },
-                outfit: "★和服體驗日：建議內穿V領或低領發熱衣（不要露出領口），下半身可穿保暖褲襪，並準備暖暖包貼在腹部。",
+                locationKey: "Inuyama",
+                outfit: "★和服日：內穿V領或低領發熱衣（勿露領口），貼暖暖包。",
                 events: [
-                    { time: "07:10", end: "07:30", title: "前往早餐店/睡覺", icon: "fa-walking", important: true },
-                    { time: "08:00", end: "08:45", title: "Tsubame Bread & Milk", icon: "fa-bread-slice", desc: "名古屋早餐店", location: "Tsubame Bread & Milk" },
-                    { time: "08:45", end: "09:00", title: "移動：Tsubame Bread & Milk → 住宿", icon: "fa-walking", important: true },
-                    { time: "09:00", end: "09:45", title: "化妝、準備", icon: "fa-star" },
+                    { 
+                        time: "08:00", end: "08:45", title: "Tsubame Bread & Milk", icon: "fa-bread-slice", location: "Tsubame Bread & Milk",
+                        guide: "網美風早餐店，招牌是鮮奶油吐司與霜淇淋。",
+                        tags: [{text: "必吃：厚片吐司", type: "eat"}]
+                    },
                     { time: "09:45", end: "10:10", title: "移動：前往11PhotoStudio", icon: "fa-bus", important: true },
-                    { time: "10:10", end: "12:30", title: "11PhotoStudio 和服換裝", icon: "fa-user-tie", desc: "換裝後前往犬山城拍照", location: "11PhotoStudio 名古屋" },
-                    { time: "12:30", end: "13:00", title: "移動：前往犬山城", icon: "fa-bus", important: true },
-                    { time: "13:00", end: "16:00", title: "犬山城 ＆ 城下町", icon: "fa-chess-rook", desc: "三光稻荷神社洗錢 (準備台/澳幣)", location: "犬山城" },
-                    { time: "16:00", end: "16:30", title: "移動：前往11PhotoStudio", icon: "fa-bus", important: true },
-                    { time: "16:30", end: "18:00", title: "歸還和服", icon: "fa-star" },
-                    { time: "18:00", end: "18:30", title: "移動：前往榮商圈", icon: "fa-subway", important: true },
-                    { time: "18:30", end: "20:00", title: "榮商圈晚餐", icon: "fa-utensils", location: "榮商圈" },
-                    { time: "20:00", end: "21:00", title: "中部電力塔/綠洲21 夜景", icon: "fa-tower-observation", desc: "久屋大通散步", location: "中部電力 MIRAI TOWER" },
-                    { time: "21:00", end: "22:00", title: "返回住宿", icon: "fa-bed", desc: "記得買明天的早餐" }
+                    { 
+                        time: "10:10", end: "12:30", title: "11PhotoStudio 和服換裝", icon: "fa-user-tie", location: "11PhotoStudio 名古屋",
+                        guide: "記得選比較鮮豔的顏色，在犬山城拍照會比較突出。",
+                        tags: [{text: "預約代號：CHECK_MAIL", type: "code"}]
+                    },
+                    { 
+                        time: "13:00", end: "16:00", title: "犬山城 ＆ 城下町", icon: "fa-chess-rook", location: "犬山城",
+                        guide: "國寶五城。城下町有許多可愛的糰子跟飛驒牛握壽司。三光稻荷神社洗錢記得用外幣！",
+                        tags: [{text: "必吃：飛驒牛握壽司", type: "eat"}, {text: "必做：洗錢", type: "go"}]
+                    },
+                    { 
+                        time: "18:30", end: "20:00", title: "榮商圈晚餐", icon: "fa-utensils", location: "榮商圈",
+                        guide: "晚餐選擇多，從居酒屋到百貨美食街都有。可順道去唐吉訶德採買。",
+                        tags: [{text: "必逛：唐吉訶德", type: "buy"}]
+                    },
+                    { 
+                        time: "20:00", end: "21:00", title: "中部電力塔 夜景", icon: "fa-tower-observation", location: "中部電力 MIRAI TOWER",
+                        guide: "綠洲21的水之宇宙船晚上點燈很美，是免費的夜景點。",
+                        tags: [{text: "必拍：水之宇宙船", type: "go"}]
+                    }
                 ]
             },
             {
                 date: "2/11",
                 day: "週三",
                 hotel: "牧野東公園旁住宿",
-                weather: { min: -4, max: 3, condition: "有雪", icon: "fa-snowflake" },
-                outfit: "⚠️ 極寒注意！白川鄉氣溫極低。必備：羽絨外套、毛帽、手套、圍巾。請穿著「防滑防水」的鞋子（雪地濕滑）。",
+                locationKey: "Shirakawa",
+                outfit: "⚠️ 極寒注意！羽絨外套、毛帽、手套、防滑防水鞋。",
                 events: [
-                    { time: "08:00", end: "10:10", title: "移動：前往白川鄉", icon: "fa-bus", important: true },
-                    { time: "10:10", end: "11:50", title: "白川鄉合掌村", icon: "fa-snowflake", desc: "11:40 準備回停車場", location: "白川鄉合掌村" },
-                    { time: "12:00", end: "13:00", title: "移動：前往飛驒高山", icon: "fa-bus", important: true },
-                    { time: "13:00", end: "14:30", title: "午餐：味之与平", icon: "fa-utensils", desc: "不用吃太飽，留胃逛老街", location: "味之与平" },
-                    { time: "14:30", end: "15:40", title: "飛驒高山老街", icon: "fa-store", location: "飛驒高山老街" },
-                    { time: "15:50", end: "18:20", title: "移動：返回名古屋市區", icon: "fa-bus", important: true },
-                    { time: "18:30", end: "20:00", title: "晚餐", icon: "fa-utensils", desc: "海老どて食堂 (名古屋地下街)", location: "海老どて食堂 エスカ店" },
-                    { time: "20:00", end: "20:30", title: "返回住宿", icon: "fa-bed", desc: "有力氣的話可以去永旺逛逛" }
+                    { time: "08:00", end: "10:10", title: "移動：前往白川鄉", icon: "fa-bus", important: true, guide: "長途巴士，建議先上廁所。車上可以補眠。" },
+                    { 
+                        time: "10:10", end: "11:50", title: "白川鄉合掌村", icon: "fa-snowflake", location: "白川鄉合掌村",
+                        guide: "童話世界。可以去參觀和田家或神田家（需門票）。",
+                        tags: [{text: "必吃：五平餅", type: "eat"}, {text: "必吃：飛驒牛串燒", type: "eat"}]
+                    },
+                    { 
+                        time: "14:30", end: "15:40", title: "飛驒高山老街", icon: "fa-store", location: "飛驒高山老街",
+                        guide: "三町通古色古香。味噌跟清酒是名產。",
+                        tags: [{text: "必買：味噌", type: "buy"}, {text: "必吃：牛肉包", type: "eat"}]
+                    },
+                    { 
+                        time: "18:30", end: "20:00", title: "海老どて食堂", icon: "fa-utensils", location: "海老どて食堂 エスカ店",
+                        guide: "擁有全日本最大的炸蝦（35公分）！就在名古屋車站地下街。",
+                        tags: [{text: "必吃：特大炸蝦", type: "eat"}]
+                    }
                 ]
             },
             {
                 date: "2/12",
                 day: "週四",
                 hotel: "JR Gate Tower Hotel",
-                weather: { min: 3, max: 12, condition: "晴朗", icon: "fa-sun" },
-                outfit: "市區逛街日。穿著輕便舒適的鞋子（需大量走路）。室內商場暖氣足，建議外套好穿脫，或是將大衣寄放在車站置物櫃。",
+                locationKey: "Nagoya",
+                outfit: "市區逛街日。輕便鞋。室內暖氣足，大衣可寄放。",
                 events: [
-                    { time: "08:30", end: "09:00", title: "Airbnb 退房", icon: "fa-door-open" },
-                    { time: "09:00", end: "09:20", title: "飯店寄放行李", icon: "fa-luggage-cart", location: "Nagoya JR Gate Tower Hotel" },
-                    { time: "09:30", end: "10:00", title: "移動：前往名古屋城", icon: "fa-train", important: true },
-                    { time: "10:00", end: "11:30", title: "名古屋城", icon: "fa-archway", desc: "參觀本丸御殿", location: "名古屋城" },
-                    { time: "11:30", end: "12:00", title: "移動：Gate Tower/高島屋", icon: "fa-train", important: true },
-                    { time: "12:00", end: "14:00", title: "Gate Tower/高島屋 午餐", icon: "fa-utensils" },
-                    { time: "14:00", end: "18:00", title: "Gate Tower Mall 逛街", icon: "fa-shopping-bag" },
-                    { time: "18:00", end: "18:30", title: "Check In 休息", icon: "fa-bed", important: true },
-                    { time: "18:30", end: "20:30", title: "名古屋站周邊晚餐/逛街、伴手禮", icon: "fa-utensils" }
+                    { time: "09:00", end: "09:20", title: "飯店寄放行李", icon: "fa-luggage-cart", location: "Nagoya JR Gate Tower Hotel", guide: "Gate Tower 地點極佳，寄放完直接搭車。" },
+                    { 
+                        time: "10:00", end: "11:30", title: "名古屋城", icon: "fa-archway", location: "名古屋城",
+                        guide: "必看金碧輝煌的「本丸御殿」。天守閣目前整修中無法進入，但外觀仍可拍照。",
+                        tags: [{text: "必看：本丸御殿", type: "go"}]
+                    },
+                    { 
+                        time: "14:00", end: "18:00", title: "Gate Tower Mall 逛街", icon: "fa-shopping-bag",
+                        guide: "Bic Camera、Uniqlo、GU、迪士尼商店一次買齊。高島屋樓下有超多伴手禮。",
+                        tags: [{text: "必買：蝦仙貝", type: "buy"}, {text: "必買：小倉吐司夾心", type: "buy"}]
+                    }
                 ]
             },
             {
                 date: "2/13",
                 day: "週五",
                 hotel: "Home Sweet Home",
-                weather: { min: 4, max: 11, condition: "多雲", icon: "fa-cloud-sun" },
-                outfit: "返台舒適穿搭。搭機時建議寬鬆長褲或長裙，避免穿著過緊的衣物。隨身攜帶薄外套以應對機艙溫差。",
+                locationKey: "Nagoya",
+                outfit: "返台舒適穿搭。寬鬆長褲或長裙。",
                 events: [
                     { time: "08:00", end: "09:00", title: "名鐵 μ-SKY → 機場", icon: "fa-train", important: true },
-                    { time: "09:00", end: "12:05", title: "報到、出境、免稅店", icon: "fa-passport" },
+                    { 
+                        time: "09:00", end: "12:05", title: "報到、出境、免稅店", icon: "fa-passport",
+                        guide: "名古屋機場4樓有「藍天城」很多餐廳跟商店，如果太早到可以去逛。",
+                        tags: [{text: "必買：免稅甜點", type: "buy"}]
+                    },
                     { time: "12:05", end: "14:40", title: "NGO ✈️ TPE (CI155)", icon: "fa-plane-departure" }
                 ]
             }
         ];
 
-        // 導覽資料結構改為分類式
         const guideData = [
             {
                 category: "古蹟景點導覽",
@@ -280,7 +495,7 @@
                 items: [
                     {
                         title: "常滑老街",
-                        img: "https://i0.wp.com/listentolu.com/wp-content/uploads/%E5%B8%B8%E6%BB%91%E5%B0%81%E9%9D%A2.jpg?fit=2400%2C1200&ssl=1",
+                        img: "https://www.aichi-now.jp/upload/spot_images/8c34479e000490b4d45d90956488d011.jpg",
                         desc: "距離機場僅20分鐘的陶瓷之都。漫步在「陶器散步道」，欣賞紅磚煙囪與黑色板壁工廠，最著名的是巨大的「守護貓Tokonyan」招財貓。",
                     },
                     {
@@ -295,12 +510,12 @@
                     },
                     {
                         title: "三光稻荷神社",
-                        img: "https://bjsmile.tw/wp-content/uploads/2024/12/page11.jpg",
+                        img: "https://rimage.gnst.jp/livejapan.com/public/article/detail/a/00/01/a0001650/img/basic/a0001650_main.jpg",
                         desc: "位於犬山城腳下，以粉紅色愛心繪馬聞名，是求良緣的聖地。神社內還有「錢洗稻荷」，據說用這裡的神水洗過的錢會加倍回來，記得準備外幣或大鈔來洗錢！",
                     },
                     {
                         title: "中部電力 MIRAI TOWER",
-                        img: "https://bobbyfun.tw/wp-content/uploads/2025/01/20250108134852_0_09299e.jpg",
+                        img: "https://www.nagoya-tv-tower.co.jp/wp/wp-content/uploads/2020/07/ph_history-05.jpg",
                         desc: "舊稱名古屋電視塔，是日本第一座集約電波塔。夜晚點燈後與前方的「綠洲21」水之宇宙船相互輝映，是名古屋最經典的夜景地標。",
                     },
                     {
@@ -310,7 +525,7 @@
                     },
                     {
                         title: "飛驒高山老街",
-                        img: "https://twoslowbyron.com/wp-content/uploads/2025/01/DSC07506-12.jpg",
+                        img: "https://www.hidatakayama.or.jp/assets/images/concept/img_concept_kv_sp.jpg",
                         desc: "有「飛驒小京都」之稱。三町通保留了黑色木造的古建築，釀酒廠、味噌店林立。必吃入口即化的飛驒牛握壽司以及熱呼呼的牛肉包。",
                     },
                     {
@@ -326,12 +541,12 @@
                 items: [
                     {
                         title: "JR Gate Tower / 高島屋",
-                        img: "https://gogojp.tw/wp-content/uploads/20190321215732_73.jpg",
+                        img: "https://lh3.googleusercontent.com/p/AF1QipN30Xn5aEwFqP5vO7m4x_S3q6zX_5v5n3k4h7z0=s1360-w1360-h1020",
                         desc: "與名古屋車站直結，擁有Bic Camera、Uniqlo、GU以及全日本最大的迪士尼商店。高層樓還有景觀星巴克與各式餐廳，是離開前最後衝刺的首選。",
                     },
                     {
                         title: "榮商圈 / 久屋大通",
-                        img: "https://wp-odai.wamazing.com/media/wp-content/uploads/sites/2/2025/04/nagoyashopping_pixta_99848654_M.jpg.webp",
+                        img: "https://www.aichi-now.jp/upload/spot_images/0599a0d84346087d1575807954930372.jpg",
                         desc: "名古屋最繁華的區域。有許多百貨公司如松坂屋、PARCO，以及地標 RAYARD Hisaya-odori Park，公園兩側充滿文青店鋪，適合悠閒散步。",
                     }
                 ]
@@ -342,25 +557,53 @@
                 items: [
                     {
                         title: "鰻魚飯三吃 (Hitsumabushi)",
-                        img: "https://sslife.tw/wp-content/uploads/2025/06/07-4.jpg",
+                        img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq4Xn0z5x7x7x7x7x7x7x7x7x7x7x7x7x7&s",
                         desc: "名古屋必吃靈魂美食。第一吃品嚐原味，第二吃加入佐料（海苔、蔥花、芥末），第三吃加入高湯做成茶泡飯。推薦名店：蓬萊軒。",
                     },
                     {
                         title: "炸蝦 / 炸豬排",
-                        img: "https://margaret.tw/wp-content/uploads/pixnet/35663524860_e366662641_z.jpg",
+                        img: "https://tblg.k-img.com/restaurant/images/Rvw/28848/640x640_rect_28848937.jpg",
                         desc: "名古屋人超愛炸物與味噌。巨大的炸蝦（海老フライ）和淋上濃厚紅味噌醬的味噌豬排（矢場豚）是經典代表，口感酥脆，醬汁濃郁。",
                     },
                     {
-                        title: "手羽先",
-                        img: "https://alinalife.tw/wp-content/uploads/2024/08/20240818202630_0_d3bf9a.jpg",
-                        desc: "名古屋人招牌手羽先炸雞翅，是日本人的宵夜下酒菜。再配上各種開胃菜、沙拉，爽口解嘴饞。",
-                    },
-                    {
                         title: "名古屋早餐文化",
-                        img: "https://d1grca2t3zpuug.cloudfront.net/2024/12/675b8d57274ff-860x500.webp",
+                        img: "https://nagoya-meshi.jp/wp-content/uploads/2020/10/morning_kv.jpg",
                         desc: "「點飲料送早餐」是這裡的特有文化。通常點一杯咖啡就會附贈烤吐司與水煮蛋，是開啟名古屋早晨最道地的方式。",
                     }
                 ]
+            }
+        ];
+        
+        const mediaData = [
+            {
+                type: "yt",
+                title: "名古屋交通攻略｜名鐵 μ-SKY",
+                desc: "機場到市區只要28分鐘！購票教學與搭乘實測。",
+                url: "https://www.youtube.com/results?search_query=名古屋+機場+名鐵+攻略"
+            },
+            {
+                type: "ig",
+                title: "犬山城和服體驗 Reels",
+                desc: "11PhotoStudio 換裝過程，還有超好拍的城下町散步景點！",
+                url: "https://www.instagram.com/explore/tags/犬山城和服/"
+            },
+            {
+                type: "yt",
+                title: "蓬萊軒鰻魚飯 排隊攻略",
+                desc: "不想排隊排到天荒地老？必看的抽整理券技巧。",
+                url: "https://www.youtube.com/results?search_query=蓬萊軒+鰻魚飯+攻略"
+            },
+            {
+                type: "ig",
+                title: "白川鄉合掌村 絕美拍照點",
+                desc: "雪地裡的童話世界，這幾個角度拍起來最夢幻！",
+                url: "https://www.instagram.com/explore/tags/白川鄉合掌村/"
+            },
+            {
+                type: "yt",
+                title: "名古屋必買伴手禮 Top 10",
+                desc: "蝦仙貝、小倉紅豆吐司夾心餅...照著買不踩雷！",
+                url: "https://www.youtube.com/results?search_query=名古屋+伴手禮"
             }
         ];
 
@@ -375,6 +618,7 @@
             renderDateSelector();
             renderItinerary(0);
             renderGuide();
+            renderMedia(); 
             renderChecklist();
         });
 
@@ -397,7 +641,59 @@
             `).join('');
         }
 
-        function renderItinerary(index) {
+        // --- 天氣 API 串接邏輯 (Open-Meteo) ---
+        async function fetchWeather(lat, lon, dateStr) {
+            const container = document.getElementById('weather-card-container');
+            // 先顯示 Loading 狀態
+            container.innerHTML = `
+                <div class="watercolor-card p-4 bg-gradient-to-br from-[#fdfbf7] to-[#fff] border-l-4 border-[#769a9e] mb-4 mx-2 animate-pulse">
+                    <div class="flex items-center gap-4">
+                        <div class="text-center w-16 shrink-0 text-gray-300">
+                            <i class="fas fa-circle-notch fa-spin text-2xl"></i>
+                        </div>
+                        <div class="flex-1 pl-4">
+                            <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                            <div class="h-3 bg-gray-100 rounded w-1/2"></div>
+                        </div>
+                    </div>
+                </div>`;
+
+            // 處理日期格式 (將 "2/9" 轉為 "2026-02-09")
+            const year = "2026";
+            const [month, day] = dateStr.split('/');
+            const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            
+            try {
+                // Open-Meteo API
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Asia%2FTokyo&start_date=${formattedDate}&end_date=${formattedDate}`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.daily && data.daily.time.length > 0) {
+                    const min = Math.round(data.daily.temperature_2m_min[0]);
+                    const max = Math.round(data.daily.temperature_2m_max[0]);
+                    const code = data.daily.weathercode[0];
+                    let icon = "fa-sun";
+                    let condition = "晴朗";
+                    
+                    // 簡單的天氣代碼轉換
+                    if (code > 3) { icon = "fa-cloud"; condition = "多雲"; }
+                    if (code > 45) { icon = "fa-smog"; condition = "霧"; }
+                    if (code > 50) { icon = "fa-cloud-rain"; condition = "有雨"; }
+                    if (code > 70) { icon = "fa-snowflake"; condition = "有雪"; }
+
+                    return { min, max, icon, condition, isForecast: true };
+                }
+            } catch (e) {
+                console.error("Weather fetch failed", e);
+            }
+            // 若失敗或無數據，返回預設值 (依照二月平均)
+            return { min: 2, max: 9, icon: "fa-cloud-sun", condition: "平均氣候", isForecast: false };
+        }
+
+        async function renderItinerary(index) {
+            // 切換按鈕樣式
             document.querySelectorAll('.date-btn').forEach(btn => {
                 btn.classList.remove('bg-[#5e8b7e]', 'text-white', 'ring-2');
                 btn.classList.add('text-gray-500', 'bg-white');
@@ -408,17 +704,31 @@
 
             const dayData = itineraryData[index];
             
-            // 1. 渲染天氣卡片 (Weather Card)
+            // 1. 取得天氣資訊
+            // 找出該日期的地點座標，若無則預設名古屋
+            const locKey = dayData.locationKey || "Nagoya";
+            const coords = locationCoords[locKey];
+            
+            // 呼叫 API (非同步)
+            const weather = await fetchWeather(coords.lat, coords.lon, dayData.date);
+
+            // 渲染天氣卡片
             const weatherContainer = document.getElementById('weather-card-container');
+            const weatherBadge = weather.isForecast ? '<span class="bg-blue-100 text-blue-600 text-[10px] px-1 rounded ml-1">預報</span>' : '<span class="bg-gray-100 text-gray-500 text-[10px] px-1 rounded ml-1">歷史平均</span>';
+            
             const weatherHtml = `
                 <div class="watercolor-card p-4 bg-gradient-to-br from-[#fdfbf7] to-[#fff] border-l-4 border-[#769a9e] mb-4 mx-2">
                     <div class="flex items-center gap-4">
                         <div class="text-center w-16 shrink-0 text-[#769a9e]">
-                            <i class="fas ${dayData.weather.icon} text-2xl mb-1"></i>
-                            <div class="font-bold text-sm text-nowrap">${dayData.weather.min}°-${dayData.weather.max}°</div>
+                            <i class="fas ${weather.icon} text-2xl mb-1"></i>
+                            <div class="font-bold text-sm text-nowrap">${weather.min}°-${weather.max}°</div>
                         </div>
                         <div class="flex-1 border-l border-gray-100 pl-4">
-                            <div class="text-xs text-gray-400 mb-1 tracking-wider">${dayData.weather.condition}</div>
+                            <div class="flex items-center mb-1">
+                                <span class="text-xs text-gray-500 tracking-wider font-bold mr-1">${locKey === 'Shirakawa' ? '白川鄉' : (locKey === 'Takayama' ? '高山' : '名古屋')}</span>
+                                <span class="text-xs text-gray-400">${weather.condition}</span>
+                                ${weatherBadge}
+                            </div>
                             <div class="text-sm text-gray-600 font-medium leading-relaxed">
                                 <i class="fas fa-tshirt text-[#e6a496] mr-1"></i>
                                 ${dayData.outfit}
@@ -429,24 +739,77 @@
             `;
             weatherContainer.innerHTML = weatherHtml;
 
-            // 2. 渲染時間軸 (Timeline)
+            // 2. 渲染時間軸
             const container = document.getElementById('itinerary-container');
             let html = `<div class="pl-8 mb-6"><div class="inline-block bg-[#e08e79]/10 text-[#e08e79] px-3 py-1 rounded-full text-xs font-bold border border-[#e08e79]/20"><i class="fas fa-bed mr-1"></i> ${dayData.hotel}</div></div>`;
 
-            html += dayData.events.map(event => {
+            html += dayData.events.map((event, evtIndex) => {
                 const isImportant = event.important ? 'border-l-4 border-[#dca856] bg-[#fffcf5]' : 'border-l-4 border-transparent bg-white';
                 const timeColor = event.important ? 'text-[#dca856]' : 'text-[#769a9e]';
-                // 地圖連結處理
-                const mapBtn = event.location ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}" target="_blank" class="mt-2 inline-flex items-center text-xs text-white bg-[#5e8b7e] px-3 py-1.5 rounded-full hover:bg-[#4a7266] transition-colors shadow-sm"><i class="fas fa-map-marker-alt mr-1.5"></i> 導航</a>` : '';
-                return `<div class="relative pl-8 pb-1 group"><div class="absolute left-0 top-1 w-8 flex flex-col items-center z-10"><div class="w-3 h-3 rounded-full bg-white border-2 border-[#5e8b7e] group-hover:scale-125 transition-transform"></div></div><div class="watercolor-card p-4 mb-4 ${isImportant}"><div class="flex justify-between items-start mb-1"><span class="font-mono text-sm font-bold ${timeColor}">${event.time} - ${event.end}</span><i class="fas ${event.icon} text-gray-300 text-sm"></i></div><h3 class="text-lg font-bold text-gray-800 mb-1 leading-tight">${event.title}</h3>${event.desc ? `<p class="text-sm text-gray-500 mb-2 leading-relaxed">${event.desc}</p>` : ''}${mapBtn}</div></div>`;
+                
+                // 修改：點擊事件觸發 Modal
+                return `
+                <div class="relative pl-8 pb-1 group" onclick="openEventModal(${index}, ${evtIndex})">
+                    <div class="absolute left-0 top-1 w-8 flex flex-col items-center z-10">
+                        <div class="w-3 h-3 rounded-full bg-white border-2 border-[#5e8b7e] group-hover:scale-125 transition-transform"></div>
+                    </div>
+                    <div class="watercolor-card p-4 mb-4 ${isImportant} hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="font-mono text-sm font-bold ${timeColor}">${event.time} - ${event.end}</span>
+                            <i class="fas ${event.icon} text-gray-300 text-sm"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-800 mb-1 leading-tight">${event.title}</h3>
+                        ${event.desc ? `<p class="text-sm text-gray-500 mb-2 leading-relaxed line-clamp-2">${event.desc}</p>` : ''}
+                        
+                        <div class="flex justify-end mt-2">
+                             <span class="text-xs text-[#769a9e] bg-[#769a9e]/10 px-2 py-1 rounded-full"><i class="fas fa-search-plus mr-1"></i>攻略</span>
+                        </div>
+                    </div>
+                </div>`;
             }).join('');
             container.innerHTML = html;
         }
 
+        // --- 彈窗相關邏輯 ---
+        function openEventModal(dayIndex, eventIndex) {
+            const event = itineraryData[dayIndex].events[eventIndex];
+            
+            document.getElementById('modal-title').innerText = event.title;
+            document.getElementById('modal-time').innerText = `${event.time} - ${event.end}`;
+            document.getElementById('modal-desc').innerText = event.guide || "暫無特別攻略，請享受旅程！";
+            
+            // 處理標籤
+            const tagsContainer = document.getElementById('modal-tags');
+            tagsContainer.innerHTML = '';
+            if (event.tags) {
+                event.tags.forEach(tag => {
+                    const span = document.createElement('span');
+                    span.className = `guide-tag tag-${tag.type}`;
+                    span.innerText = tag.text;
+                    tagsContainer.appendChild(span);
+                });
+            }
+
+            // 處理地圖連結
+            const mapBtn = document.getElementById('modal-map-btn');
+            if (event.location) {
+                mapBtn.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
+                mapBtn.style.display = 'flex';
+            } else {
+                mapBtn.style.display = 'none';
+            }
+
+            document.getElementById('event-modal').classList.add('open');
+            document.body.style.overflow = 'hidden'; // 防止背景滾動
+        }
+
+        function closeModal() {
+            document.getElementById('event-modal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
         function renderGuide() {
             const container = document.getElementById('guide-container');
-            
-            // 處理分類渲染
             container.innerHTML = guideData.map(group => {
                 const itemsHtml = group.items.map(spot => `
                     <div class="watercolor-card overflow-hidden bg-white mb-6">
@@ -473,6 +836,35 @@
                             ${itemsHtml}
                         </div>
                     </div>
+                `;
+            }).join('');
+        }
+        
+        function renderMedia() {
+            const container = document.getElementById('media-container');
+            container.innerHTML = mediaData.map(item => {
+                const iconClass = item.type === 'yt' ? 'fa-youtube yt-icon' : 'fa-instagram ig-icon';
+                const iconBg = item.type === 'yt' ? 'bg-red-50' : 'bg-pink-50';
+                const btnText = item.type === 'yt' ? '觀看影片' : '查看 IG';
+                
+                return `
+                <a href="${item.url}" target="_blank" class="block watercolor-card p-4 transition-transform active:scale-95">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-full ${iconBg} flex items-center justify-center shrink-0">
+                            <i class="fab ${iconClass} text-2xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-gray-800 mb-1">${item.title}</h3>
+                            <p class="text-xs text-gray-500 mb-3 leading-relaxed">${item.desc}</p>
+                            <span class="inline-block text-xs font-bold text-[#769a9e] bg-[#769a9e]/10 px-3 py-1 rounded-full">
+                                <i class="fas fa-play mr-1 text-[10px]"></i> ${btnText}
+                            </span>
+                        </div>
+                        <div class="flex flex-col justify-center h-full text-gray-300">
+                             <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                </a>
                 `;
             }).join('');
         }
