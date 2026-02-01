@@ -25,17 +25,18 @@
         }
 
         body {
-            /* 全域字體改為思源黑體/台北黑體風格 */
-            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            /* 優先使用微軟正黑體、蘋果儷中黑 */
+            font-family: "Microsoft JhengHei", "PingFang TC", "Heiti TC", "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-paper);
             color: var(--text-main);
             /* 模擬紙張紋理 */
             background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
             -webkit-font-smoothing: antialiased;
+            font-weight: 500;
         }
 
         h1, h2, h3, .handwriting {
-            font-family: 'Yomogi', cursive;
+            font-family: 'Yomogi', "Microsoft JhengHei", cursive;
         }
 
         /* 隱藏捲軸但保留功能 */
@@ -47,7 +48,7 @@
             scrollbar-width: none;
         }
 
-        /* 水彩風格卡片 (不規則邊框) */
+        /* 水彩風格卡片 */
         .watercolor-card {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(4px);
@@ -59,13 +60,6 @@
         
         .watercolor-card:active {
             transform: scale(0.98);
-        }
-
-        /* 水彩按鈕 */
-        .btn-water {
-            border-radius: 25px 255px 25px 255px / 255px 25px 255px 25px;
-            transition: all 0.3s ease;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
         }
 
         /* 時間軸線條 */
@@ -108,22 +102,6 @@
         .tab-content.active {
             display: block;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .memo-link {
-            display: inline-block;
-            margin: 4px;
-            padding: 4px 12px;
-            background-color: var(--secondary);
-            color: white;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            text-decoration: none;
-        }
     </style>
 </head>
 <body class="pb-24">
@@ -142,8 +120,9 @@
     </header>
 
     <section id="plan" class="tab-content active px-4 pt-4">
-        <div class="flex overflow-x-auto no-scrollbar gap-3 mb-6 pb-2" id="date-scroll"></div>
-        <div id="itinerary-container" class="space-y-6 relative timeline-line"></div>
+        <div class="flex overflow-x-auto no-scrollbar gap-3 mb-4 pb-2" id="date-scroll"></div>
+        <div id="weather-card-container"></div>
+        <div id="itinerary-container" class="space-y-6 relative timeline-line mt-4"></div>
     </section>
 
     <section id="guide" class="tab-content px-4 pt-4 space-y-6">
@@ -155,18 +134,11 @@
     </section>
 
     <section id="lists" class="tab-content px-4 pt-4">
-        <div class="mb-8">
+        <div class="mb-20">
             <h2 class="text-xl handwriting mb-3 text-[#e6a496]"><i class="fas fa-suitcase-rolling mr-2"></i>Packing List</h2>
             <div class="bg-white p-5 rounded-[20px] shadow-sm relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-full h-1 bg-[#e6a496]"></div>
                 <div id="checklist-container" class="space-y-3"></div>
-            </div>
-        </div>
-        <div class="mb-20">
-            <h2 class="text-xl handwriting mb-3 text-[#dca856]"><i class="fas fa-pen-nib mr-2"></i>Memo</h2>
-            <div class="bg-white p-4 rounded-[20px] shadow-sm border border-gray-100">
-                <textarea id="user-memo" class="w-full h-40 p-3 text-gray-700 bg-[#fdfbf7] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#dca856]/50 resize-none text-sm" placeholder="隨手記下想去的店、購物清單..."></textarea>
-                <div id="memo-links-area" class="mt-3 flex flex-wrap gap-2"></div>
             </div>
         </div>
     </section>
@@ -212,6 +184,9 @@
                 date: "2/9",
                 day: "週一",
                 hotel: "牧野東公園旁住宿",
+                // 新增天氣資訊
+                weather: { min: 3, max: 11, condition: "晴時多雲", icon: "fa-sun" },
+                outfit: "室內外溫差大。機場與電車暖氣強，建議「洋蔥式穿搭」，內層薄長袖，外搭保暖大衣方便穿脫。",
                 events: [
                     { time: "05:00", end: "05:30", title: "前往桃園機場", icon: "fa-car", important: true },
                     { time: "07:35", end: "11:05", title: "TPE ✈️ NGO (CI154)", icon: "fa-plane", desc: "抵達中部國際機場 T1" },
@@ -229,6 +204,8 @@
                 date: "2/10",
                 day: "週二",
                 hotel: "牧野東公園旁住宿",
+                weather: { min: 2, max: 10, condition: "多雲", icon: "fa-cloud" },
+                outfit: "★和服體驗日：建議內穿V領或低領發熱衣（不要露出領口），下半身可穿保暖褲襪，並準備暖暖包貼在腹部。",
                 events: [
                     { time: "07:10", end: "07:30", title: "前往早餐店/睡覺", icon: "fa-walking", important: true },
                     { time: "08:00", end: "08:45", title: "Tsubame Bread & Milk", icon: "fa-bread-slice", desc: "名古屋早餐店", location: "Tsubame Bread & Milk" },
@@ -250,6 +227,8 @@
                 date: "2/11",
                 day: "週三",
                 hotel: "牧野東公園旁住宿",
+                weather: { min: -4, max: 3, condition: "有雪", icon: "fa-snowflake" },
+                outfit: "⚠️ 極寒注意！白川鄉氣溫極低。必備：羽絨外套、毛帽、手套、圍巾。請穿著「防滑防水」的鞋子（雪地濕滑）。",
                 events: [
                     { time: "08:00", end: "10:10", title: "移動：前往白川鄉", icon: "fa-bus", important: true },
                     { time: "10:10", end: "11:50", title: "白川鄉合掌村", icon: "fa-snowflake", desc: "11:40 準備回停車場", location: "白川鄉合掌村" },
@@ -265,6 +244,8 @@
                 date: "2/12",
                 day: "週四",
                 hotel: "JR Gate Tower Hotel",
+                weather: { min: 3, max: 12, condition: "晴朗", icon: "fa-sun" },
+                outfit: "市區逛街日。穿著輕便舒適的鞋子（需大量走路）。室內商場暖氣足，建議外套好穿脫，或是將大衣寄放在車站置物櫃。",
                 events: [
                     { time: "08:30", end: "09:00", title: "Airbnb 退房", icon: "fa-door-open" },
                     { time: "09:00", end: "09:20", title: "飯店寄放行李", icon: "fa-luggage-cart", location: "Nagoya JR Gate Tower Hotel" },
@@ -281,6 +262,8 @@
                 date: "2/13",
                 day: "週五",
                 hotel: "Home Sweet Home",
+                weather: { min: 4, max: 11, condition: "多雲", icon: "fa-cloud-sun" },
+                outfit: "返台舒適穿搭。搭機時建議寬鬆長褲或長裙，避免穿著過緊的衣物。隨身攜帶薄外套以應對機艙溫差。",
                 events: [
                     { time: "08:00", end: "09:00", title: "名鐵 μ-SKY → 機場", icon: "fa-train", important: true },
                     { time: "09:00", end: "12:05", title: "報到、出境、免稅店", icon: "fa-passport" },
@@ -388,7 +371,6 @@
             renderItinerary(0);
             renderGuide();
             renderChecklist();
-            initMemo();
         });
 
         function switchTab(tabId) {
@@ -420,6 +402,29 @@
             activeBtn.classList.add('bg-[#5e8b7e]', 'text-white', 'ring-2', 'ring-[#5e8b7e]/50');
 
             const dayData = itineraryData[index];
+            
+            // 1. 渲染天氣卡片 (Weather Card)
+            const weatherContainer = document.getElementById('weather-card-container');
+            const weatherHtml = `
+                <div class="watercolor-card p-4 bg-gradient-to-br from-[#fdfbf7] to-[#fff] border-l-4 border-[#769a9e] mb-4 mx-2">
+                    <div class="flex items-center gap-4">
+                        <div class="text-center w-16 shrink-0 text-[#769a9e]">
+                            <i class="fas ${dayData.weather.icon} text-2xl mb-1"></i>
+                            <div class="font-bold text-sm text-nowrap">${dayData.weather.min}°-${dayData.weather.max}°</div>
+                        </div>
+                        <div class="flex-1 border-l border-gray-100 pl-4">
+                            <div class="text-xs text-gray-400 mb-1 tracking-wider">${dayData.weather.condition}</div>
+                            <div class="text-sm text-gray-600 font-medium leading-relaxed">
+                                <i class="fas fa-tshirt text-[#e6a496] mr-1"></i>
+                                ${dayData.outfit}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            weatherContainer.innerHTML = weatherHtml;
+
+            // 2. 渲染時間軸 (Timeline)
             const container = document.getElementById('itinerary-container');
             let html = `<div class="pl-8 mb-6"><div class="inline-block bg-[#e08e79]/10 text-[#e08e79] px-3 py-1 rounded-full text-xs font-bold border border-[#e08e79]/20"><i class="fas fa-bed mr-1"></i> ${dayData.hotel}</div></div>`;
 
@@ -490,19 +495,6 @@
             }
             localStorage.setItem('trip_checklist_state', JSON.stringify(savedState));
             renderChecklist();
-        }
-
-        function initMemo() {
-            const memoArea = document.getElementById('user-memo');
-            if (memoArea) {
-                // 讀取存檔
-                memoArea.value = localStorage.getItem('trip_memo') || '';
-                
-                // 綁定輸入事件，自動存檔
-                memoArea.addEventListener('input', function() {
-                    localStorage.setItem('trip_memo', this.value);
-                });
-            }
         }
     </script>
 </body>
